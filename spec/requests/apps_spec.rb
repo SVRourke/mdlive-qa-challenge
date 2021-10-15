@@ -2,24 +2,32 @@ require 'rails_helper'
 
 RSpec.describe "The Endpoint", type: :request do
   before(:all) do
-    100.times do |i| 
+    60.times do |i| 
       App.create(name: "app-#{i}")
     end
   end
 
-
-  # it "test" do
-  #   post "/apps", params: { range: {by: "id", start: 34, end: 40, max: 50} }
-  # end 
+  it "return a JSON array of 'apps'" do
+    post "/apps", params: { range: {by: "id", start: 34, end: 40, max: 50} }
+    expect(response.content_type).to eq("application/json; charset=utf-8")
+  end
 
   describe "Parameters" do
+    describe "range omitted" do
+      it "should respond with an array according to default parameters" do
+        post "/apps"
+        json = JSON.parse(response.body)
+        # expect(json["error"]).to eq("BY PARAMETER REQUIRED, 'id' or 'name'")
+        expect(response).to have_http_status(200)
+      end
+    end
+
     describe "by parameter" do
       it "is required" do
         post "/apps", params: { range: {start: 34, end: 40, max: 50} }
         json = JSON.parse(response.body)
         expect(json["error"]).to eq("BY PARAMETER REQUIRED, 'id' or 'name'")
         expect(response).to have_http_status(400)
-        
       end
       
       it "only accepts id or name as values" do
@@ -75,9 +83,9 @@ RSpec.describe "The Endpoint", type: :request do
       end
   
       it "defaults to max if omitted" do
-        post "/apps", params: { range: {by: "id", start: 1} }
+        post "/apps", params: { range: {by: "id", start: 1, max: 40} }
         json = JSON.parse(response.body)
-        expect(json.count).to eq(50)
+        expect(json.count).to eq(40)
         expect(response).to have_http_status(200)
       end
       
@@ -108,29 +116,56 @@ RSpec.describe "The Endpoint", type: :request do
         expect(json.count).to eq(50)
         expect(response).to have_http_status(200)
       end
-  
+      
+      it "max value is 50" do
+        post "/apps", params: { range: {by: "id", max: 60} }
+        json = JSON.parse(response.body)
+        expect(json.count).to eq(50)
+        expect(response).to have_http_status(200)
+      end
+      
       it "limits the number of returned records" do
-        
+        post "/apps", params: { range: {by: "id", max: 3} }
+        json = JSON.parse(response.body)
+        expect(json.count).to eq(3)
+        expect(response).to have_http_status(200)
       end
     end
+    
+    describe "order parameter" do
+      it "is not required" do
+        post "/apps", params: { range: {by: "id"} }
+        json = JSON.parse(response.body)
+        expect(response).to have_http_status(200)
+      end
+      
+      it "defaults to asc if omitted" do
+        post "/apps", params: { range: {by: "id"} }
+        json = JSON.parse(response.body)
+        expect(response).to have_http_status(200)
+        expect(json[0]["id"]).to be < json[1]["id"]
+      end
+      
+      it "accepts asc or desc as inputs" do
+        post "/apps", params: { range: {by: "id", order: 'desc'} }
+        expect(response).to have_http_status(200)
+
+        post "/apps", params: { range: {by: "id", order: 'asc'} }
+        expect(response).to have_http_status(200)
+      end
+      
+      it "determines the order of returned records" do
+        post "/apps", params: { range: {by: "id", order: 'desc'} }
+        json = JSON.parse(response.body)
+        expect(response).to have_http_status(200)
+        expect(json[0]["id"]).to be > json[1]["id"]
   
-    # describe "order parameter" do
-    #   it "is not required" do
-        
-    #   end
-  
-    #   it "defaults to asc if omitted" do
-        
-    #   end
-  
-    #   it "accepts asc or desc as inputs" do
-        
-    #   end
-  
-    #   it "determines the order of returned records" do
-        
-    #   end
-    # end
+        post "/apps", params: { range: {by: "id", order: 'asc'} }
+        json = JSON.parse(response.body)
+        expect(response).to have_http_status(200)
+        expect(json[0]["id"]).to be < json[1]["id"]
+      end
+    end
   end
 
   after(:all) do
