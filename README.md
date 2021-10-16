@@ -1,24 +1,21 @@
-# README
+# MDLIVE QA Challenge
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+### my process
 
-Things you may want to cover:
+1. extracted requirements (guessed about order)
+2. created model and controller
+3. wrote tests
+4. made tests pass
+5. deployment
 
-* Ruby version
+### My Solution
 
-* System dependencies
+1. relying on default arguments
 
-* Configuration
+### assumptions
 
-* Database creation
+- order defaults to ascending
+- order accepts only ascending or descending
+- order defaults to ascending if invalid value provided
+- results are ordered before they are start-end constrained
 
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
