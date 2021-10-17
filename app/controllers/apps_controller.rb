@@ -4,7 +4,7 @@ class AppsController < ApplicationController
 
   def apps
     # Process the request parameters
-    parameters = process_params
+    parameters = requestToQuery
 
     if parameters[:error]
       render json: parameters, status: 400
@@ -26,7 +26,10 @@ class AppsController < ApplicationController
       .permit(:by, :start, :end, :max, :order)
   end
 
-  def process_params
+  def requestToQuery
+    # This function validates the provided params, adds default or
+    # substitutes max values if/where needed. Returns an error
+    # message if no by parameter is provided within range
 
     # Check if request body has a range key,
     # if not default query parameters will be passed along
@@ -64,14 +67,12 @@ class AppsController < ApplicationController
 
       # Build the query parameters to be used by the
       # app query in the action
-      processedParams = {
-        by: raw_params[:by],
-        offset: amendedStart ? amendedStart : 0,
-        limit: startEndDiff && startEndDiff <= 50 ? startEndDiff : max,
-        order: ["asc", "desc"].include?(raw_params[:order]) ? raw_params[:order] : "asc",
-      }
-
-      return processedParams
+      return {
+               by: raw_params[:by],
+               offset: amendedStart ? amendedStart : 0,
+               limit: startEndDiff && startEndDiff <= 50 ? startEndDiff : max,
+               order: ["asc", "desc"].include?(raw_params[:order]) ? raw_params[:order] : "asc",
+             }
 
       # If no range parameter is provided, return a default set of query parameters
     else
