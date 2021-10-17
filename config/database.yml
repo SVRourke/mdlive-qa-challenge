@@ -45,6 +45,6 @@ test:
 # TBD
 production:
   <<: *default
-  database: mdlive_qa_challenge_production
-  username: mdlive_qa_challenge
-  password: <%= ENV['MDLIVE_QA_CHALLENGE_DATABASE_PASSWORD'] %>
+  database: <%= ENV['RAILS_DB'] %>
+  username: <%= ENV['RAILS_DB_USER'] %>
+  password: <%= ENV['RAILS_DB_PASSWORD'] %>
