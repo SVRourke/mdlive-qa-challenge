@@ -1,7 +1,4 @@
 class AppsController < ApplicationController
-  #   not sure if still needed
-  skip_before_action :verify_authenticity_token
-
   def apps
     # Process the request parameters
     parameters = requestToQuery
