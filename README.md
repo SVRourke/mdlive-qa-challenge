@@ -6,7 +6,11 @@
 2. created model and controller
 3. wrote tests
 4. made tests pass
-5. deployment
+5. switcfh to api
+6. add json serializer
+7. 
+?. deployment
+
 
 ### My Solution
 
